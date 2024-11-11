@@ -1,5 +1,6 @@
 import '../styles/auth.css';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -30,7 +31,7 @@ const Register = () => {
       console.log("Data:", data);
   
       if (response.ok) {
-        // window.location.href = '/login'; // Redirect to login page
+        window.location.href = '/login'; // Redirect to login page
         // Log success message
         console.log("User registered successfully.");
       } else {
