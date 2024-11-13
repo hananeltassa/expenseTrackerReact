@@ -23,8 +23,9 @@ const Login = () => {
 
       if (response.ok) {
         console.log("Login successful:", data);
-        localStorage.setItem('user', JSON.stringify(data)); 
-        //navigate('/dashboard'); 
+        localStorage.setItem("user", JSON.stringify(data));
+        console.log("User data stored:", data);
+        navigate('/expense-tracker'); 
       } else {
         setErrorMessage(data.error || 'Login failed');
       }
