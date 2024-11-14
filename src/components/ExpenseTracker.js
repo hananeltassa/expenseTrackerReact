@@ -31,6 +31,7 @@ function ExpenseTracker() {
         navigate('/login');
       }
     }, [navigate]);
+    
   
     const handleSubmit = async (e) => {
       e.preventDefault();
@@ -77,30 +78,50 @@ function ExpenseTracker() {
       const { name, value } = e.target;
       setFilters((prev) => ({ ...prev, [name]: value }));
     };
-
     const handleFilterSubmit = async (e) => {
       e.preventDefault();
       
-      // Log the filter state
-      console.log('Filters before submit:', filters);
-    
-      try {
-        const response = await fetch(`http://localhost/expenseTrackerApis/filter_transaction.php?${new URLSearchParams(filters)}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
-    
-        const data = await response.json();
-    
-        if (response.ok) {
-          setTransactions(data);
-        } else {
-          setErrorMessage('Failed to fetch transactions');
-        }
-      } catch (error) {
-        setErrorMessage('Network error. Please try again.');
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) {
+          setErrorMessage('User not logged in');
+          return;
       }
-    };
+  
+      const userData = JSON.parse(storedUser);
+      const userId = userData.user_id;
+  
+      const queryParams = new URLSearchParams();
+      
+      if (filters.type) queryParams.append('type', filters.type);
+      if (filters.min_amount) queryParams.append('min_amount', filters.min_amount);
+      if (filters.max_amount) queryParams.append('max_amount', filters.max_amount);
+      if (filters.start_date) queryParams.append('start_date', filters.start_date);
+      if (filters.end_date) queryParams.append('end_date', filters.end_date);
+  
+      queryParams.append('user_id', userId);
+  
+      console.log(`API URL: http://localhost/expenseTrackerApis/filter_transaction.php?${queryParams.toString()}`);
+      
+      try {
+          const response = await fetch(`http://localhost/expenseTrackerApis/filter_transaction.php?${queryParams.toString()}`, {
+              method: 'GET',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+          });
+  
+          const data = await response.json();
+          
+          if (response.ok) {
+              setTransactions(data); 
+          } else {
+              setErrorMessage(data.error || 'Failed to fetch transactions');
+          }
+      } catch (error) {
+          setErrorMessage('Network error. Please try again.');
+      }
+  };
+  
     
 
     return (
